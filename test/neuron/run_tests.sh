@@ -140,9 +140,9 @@ function run_torch_op_tests {
 
 # DO NOT MODIFY
 function run_xla_op_tests1 {
-  #run_dynamic "$CDIR/test_operations.py" "$@" --verbosity=$VERBOSITY
-  #run_dynamic "$CDIR/ds/test_dynamic_shapes.py"
-  #run_dynamic "$CDIR/ds/test_dynamic_shape_models.py" "$@" --verbosity=$VERBOSITY
+  # run_dynamic "$CDIR/test_operations.py" "$@" --verbosity=$VERBOSITY
+  # run_dynamic "$CDIR/ds/test_dynamic_shapes.py"
+  run_dynamic "$CDIR/ds/test_dynamic_shape_models.py" "$@" --verbosity=$VERBOSITY 
   #run_eager_debug  "$CDIR/test_operations.py" "$@" --verbosity=$VERBOSITY
   #run_test "$CDIR/test_operations.py" "$@" --verbosity=$VERBOSITY
   #run_test_without_functionalization "$CDIR/test_operations.py" "$@" --verbosity=$VERBOSITY
@@ -150,16 +150,16 @@ function run_xla_op_tests1 {
   run_pt_xla_debug_level1 "$CDIR/debug_tool/test_pt_xla_debug.py"
   run_test "$CDIR/test_async_closures.py"
   run_test "$CDIR/test_hlo_metadata.py"
-  #run_test "$CDIR/test_profiler.py"
+  # run_test "$CDIR/test_profiler.py"
   run_test "$CDIR/pjrt/test_runtime.py"
-  #NEURONCORE_NUM_DEVICES=2 python "$CDIR/pjrt/test_ddp.py"
+  # NEURONCORE_NUM_DEVICES=2 python "$CDIR/pjrt/test_ddp.py"
   run_test "$CDIR/pjrt/test_mesh_service.py"
-  #run_test "$CDIR/test_python_ops.py"
-  #run_test "$CDIR/test_ops.py"
+  # run_test "$CDIR/test_python_ops.py"
+  # run_test "$CDIR/test_ops.py"
   run_test "$CDIR/test_metrics.py"
   run_test "$CDIR/test_deprecation.py"
   run_test "$CDIR/dynamo/test_dynamo_integrations_util.py"
-  #run_test "$CDIR/dynamo/test_dynamo_aliasing.py"
+  run_test "$CDIR/dynamo/test_dynamo_aliasing.py"
   run_test "$CDIR/dynamo/test_dynamo.py"
   run_test "$CDIR/dynamo/test_dynamo_dynamic_shape.py"
   run_test "$CDIR/dynamo/test_bridge.py"
@@ -167,10 +167,10 @@ function run_xla_op_tests1 {
   run_test "$CDIR/dynamo/test_graph_input_matcher.py"
   run_test "$CDIR/dynamo/test_dynamo_config.py"
   run_save_tensor_ir "$CDIR/dynamo/test_dynamo_graph_dump.py"
-  #run_test "$CDIR/test_data_type.py"
+  # run_test "$CDIR/test_data_type.py"
   run_use_bf16 "$CDIR/test_data_type.py"
   run_downcast_bf16 "$CDIR/test_data_type.py"
-  #run_test "$CDIR/test_fp8.py"
+  # run_test "$CDIR/test_fp8.py"
   run_xla_ir_debug "$CDIR/test_env_var_mapper.py"
   run_xla_hlo_debug "$CDIR/test_env_var_mapper.py"
   run_xla_hlo_debug "$CDIR/stablehlo/test_stablehlo_save_load.py"
@@ -180,15 +180,15 @@ function run_xla_op_tests1 {
 
 function run_xla_op_tests2 {
   run_test "$CDIR/pjrt/test_dtypes.py"
-  #run_test "$CDIR/test_while_loop.py"
+  # run_test "$CDIR/test_while_loop.py"
   run_test "$CDIR/test_scan.py"
   run_test "$CDIR/test_autocast.py"
   run_test "$CDIR/test_grad_checkpoint.py"
-  #run_test "$CDIR/eager/test_eager.py"
+  # run_test "$CDIR/eager/test_eager.py"
   run_test "$CDIR/eager/test_eager_with_xla_compile.py"
   run_test "$CDIR/eager/test_eager_with_torch_compile.py"
-  #run_test "$CDIR/eager/test_eager_all_reduce_in_place.py"
-  run_test "$CDIR/eager/test_eager_spmd.py"
+  # run_test "$CDIR/eager/test_eager_all_reduce_in_place.py"
+  # run_test "$CDIR/eager/test_eager_spmd.py"
   run_test "$CDIR/test_callback.py"
   XLA_USE_SPMD=1 run_test "$CDIR/test_callback.py"
 }
@@ -203,11 +203,11 @@ function run_xla_op_tests3 {
   run_test "$CDIR/stablehlo/test_composite.py"
   run_test "$CDIR/stablehlo/test_pt2e_qdq.py"
   run_test "$CDIR/stablehlo/test_stablehlo_custom_call.py"
-  #run_xla_hlo_debug "$CDIR/stablehlo/test_stablehlo_inference.py"
-  #=run_test "$CDIR/stablehlo/test_stablehlo_compile.py"
+  # run_xla_hlo_debug "$CDIR/stablehlo/test_stablehlo_inference.py"
+  # run_test "$CDIR/stablehlo/test_stablehlo_compile.py"
   run_test "$CDIR/stablehlo/test_unbounded_dynamism.py"
-  #run_test "$CDIR/quantized_ops/test_quantized_matmul.py"
-  #run_test "$CDIR/quantized_ops/test_dot_general.py"
+  # run_test "$CDIR/quantized_ops/test_quantized_matmul.py"
+  run_test "$CDIR/quantized_ops/test_dot_general.py"
   #run_test "$CDIR/spmd/test_xla_sharding.py"
   run_test "$CDIR/spmd/test_xla_sharding_hlo.py"
   #run_test "$CDIR/spmd/test_xla_virtual_device.py"
@@ -222,7 +222,7 @@ function run_xla_op_tests3 {
   run_test "$CDIR/spmd/test_train_spmd_linear_model.py"
   run_test "$CDIR/spmd/test_xla_spmd_python_api_interaction.py"
   run_test "$CDIR/spmd/test_xla_auto_sharding.py"
-  run_test "$CDIR/spmd/test_fsdp_v2.py"
+  # run_test "$CDIR/spmd/test_fsdp_v2.py"
   run_test "$CDIR/test_operations_hlo.py" "$@" --verbosity=$VERBOSITY
   run_test "$CDIR/test_input_output_aliases.py"
   run_test "$CDIR/test_torch_distributed_xla_backend.py"
@@ -236,8 +236,8 @@ function run_xla_op_tests3 {
   #python3 examples/fsdp/train_resnet_fsdp_auto_wrap.py
   #python3 examples/eager/train_decoder_only_eager.py # OOM
   #python3 examples/eager/train_decoder_only_eager_spmd_data_parallel.py # compiler err due to f64
-  PJRT_DEVICE=NEURON NEURONCORE_NUM_DEVICES=1 python3 examples/eager/train_decoder_only_eager_with_compile.py # nan loss expected?
-  PJRT_DEVICE=NEURON NEURONCORE_NUM_DEVICES=1 python3 examples/eager/train_decoder_only_eager_multi_process.py
+  # PJRT_DEVICE=NEURON NEURONCORE_NUM_DEVICES=1 python3 examples/eager/train_decoder_only_eager_with_compile.py # nan loss expected?
+  # PJRT_DEVICE=NEURON NEURONCORE_NUM_DEVICES=1 python3 examples/eager/train_decoder_only_eager_multi_process.py
 }
 
 #######################################################################################

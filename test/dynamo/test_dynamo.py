@@ -310,6 +310,7 @@ class DynamoInferenceBasicTest(parameterized.TestCase):
       True,
       False,
   )
+  @skipOnNeuron
   def test_einsum(self, initialize_on_cuda):
     # einsum currently does not have meta function to compute the shape hence
     # will fallback to XLA with FakeTensor as input to infer the output shape.

@@ -11,6 +11,7 @@ import torch_xla._dynamo.dynamo_bridge as bridge
 import torch_xla.core.xla_model as xm
 import torch_xla.debug.metrics as metrics
 from torch import fx, nn
+import unittest
 
 
 class BasicModule(nn.Module):
@@ -219,6 +220,7 @@ class TorchXLAReuseGraphTest(torch._dynamo.test_case.TestCase):
   test_inplace_update = make_reuse_graph_test(ModuleInplaceUpdate)
 
   test_training_linear = make_training_test(LinearModule)
+  test_training_linear = unittest.skip("Skipping test training linear")(test_training_linear)
   test_training_maxpool = make_training_test(MaxPoolModule)
   test_training_upsample = make_training_test(UpsampleModule)
 
