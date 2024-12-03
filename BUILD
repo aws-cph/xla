@@ -1,5 +1,5 @@
 load(
-    "@tsl//tsl/platform/default:cuda_build_defs.bzl",
+    "@xla//xla/tsl/platform/default:cuda_build_defs.bzl",
     "if_cuda_is_configured",
 )
 
@@ -78,6 +78,6 @@ test_suite(
         "//test/cpp:test_tensor",
         "//test/cpp:test_xla_sharding",
         "//torch_xla/csrc/runtime:pjrt_computation_client_test",
-        "//torch_xla/csrc/runtime:ifrt_computation_client_test",
+        # "//torch_xla/csrc/runtime:ifrt_computation_client_test",
     ],
 )

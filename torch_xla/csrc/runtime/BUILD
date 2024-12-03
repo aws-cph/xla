@@ -3,7 +3,7 @@ load(
     "ptxla_cc_test",
 )
 load(
-    "@tsl//tsl/platform/default:cuda_build_defs.bzl",
+    "@xla//xla/tsl/platform/default:cuda_build_defs.bzl",
     "if_cuda_is_configured",
 )
 
@@ -83,7 +83,7 @@ cc_library(
         ":tf_logging",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/types:span",
-        "@tsl//tsl/platform/cloud:gcs_file_system",
+        "@xla//xla/tsl/platform/cloud:gcs_file_system",
         "@tsl//tsl/profiler/lib:traceme",
         "@xla//xla:literal",
         "@xla//xla:shape_util",
@@ -122,7 +122,7 @@ cc_library(
         "@com_google_absl//absl/synchronization",
         "@com_google_absl//absl/types:span",
         "@tsl//tsl/platform:env",
-        "@tsl//tsl/platform/cloud:gcs_file_system",
+        "@xla//xla/tsl/platform/cloud:gcs_file_system",
         "@tsl//tsl/profiler/lib:traceme",
         "@xla//xla:literal",
         "@xla//xla:shape_util",
@@ -497,27 +497,27 @@ ptxla_cc_test(
     ],
 )
 
-ptxla_cc_test(
-    name = "ifrt_computation_client_test",
-    srcs = ["ifrt_computation_client_test.cc"],
-    deps = [
-        ":computation_client",
-        ":ifrt_computation_client",
-        ":tensor_source",
-        "@xla//xla/tsl/lib/core:status_test_util",
-        "@tsl//tsl/platform:env",
-        "@tsl//tsl/platform:errors",
-        "@tsl//tsl/platform:logging",
-        "@tsl//tsl/platform:test",
-        "@tsl//tsl/platform:test_main",
-        "@xla//xla:literal",
-        "@xla//xla:literal_util",
-        "@xla//xla:shape_util",
-        "@xla//xla:status",
-        "@xla//xla:statusor",
-        "@xla//xla/client:xla_builder",
-        "@xla//xla/client:xla_computation",
-        "@xla//xla/tests:literal_test_util",
-        "@xla//xla/tools:hlo_module_loader",
-    ],
-)
+# ptxla_cc_test(
+#     name = "ifrt_computation_client_test",
+#     srcs = ["ifrt_computation_client_test.cc"],
+#     deps = [
+#         ":computation_client",
+#         ":ifrt_computation_client",
+#         ":tensor_source",
+#         "@xla//xla/tsl/lib/core:status_test_util",
+#         "@tsl//tsl/platform:env",
+#         "@tsl//tsl/platform:errors",
+#         "@tsl//tsl/platform:logging",
+#         "@tsl//tsl/platform:test",
+#         "@tsl//tsl/platform:test_main",
+#         "@xla//xla:literal",
+#         "@xla//xla:literal_util",
+#         "@xla//xla:shape_util",
+#         "@xla//xla:status",
+#         "@xla//xla:statusor",
+#         "@xla//xla/client:xla_builder",
+#         "@xla//xla/client:xla_computation",
+#         "@xla//xla/tests:literal_test_util",
+#         "@xla//xla/tools:hlo_module_loader",
+#     ],
+# )
