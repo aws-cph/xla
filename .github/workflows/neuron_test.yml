@@ -1,0 +1,15 @@
+# .github/workflows/neuron_test.yml
+name: Neuron Tests
+on: pull_request
+
+jobs:
+  test:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Tests in Neuron Container
+        run: |
+          docker run --rm \
+            -v $(pwd):/workspace \
+            public.ecr.aws/neuron/pytorch-inference-neuronx:2.6.0-neuronx-py310-sdk2.23.0-ubuntu22.04 \
+            /bin/bash -c "cd /workspace && python3 -m pytest tests/"
