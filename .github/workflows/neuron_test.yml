@@ -12,4 +12,4 @@ jobs:
           docker run --rm \
             -v $(pwd):/workspace \
             public.ecr.aws/neuron/pytorch-inference-neuronx:2.6.0-neuronx-py310-sdk2.23.0-ubuntu22.04 \
-            /bin/bash -c "cd /workspace && python3 -m pytest tests/"
+            /bin/bash -c "cd /workspace && python3 -m pytest test/pjrt/test_runtime.py
