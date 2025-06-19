@@ -9,6 +9,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Run Tests in Neuron Container
         run: |
+          ls -al
+          pwd
           docker run --rm \
             -v $(pwd):/workspace \
             public.ecr.aws/neuron/pytorch-inference-neuronx:2.6.0-neuronx-py310-sdk2.23.0-ubuntu22.04 \
