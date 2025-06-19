@@ -1,25 +1,18 @@
 name: Neuron Tests
 on: pull_request
 
+# Add these permissions
+permissions:
+  contents: read
+  actions: write
+  checks: write
+  pull-requests: write  # Add this one too for good measure
+
 jobs:
   test:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
-      
-      - name: Update Check Status - In Progress
-        uses: actions/github-script@v6
-        with:
-          script: |
-            await github.rest.checks.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              name: 'Neuron Tests',
-              head_sha: context.sha,
-              status: 'in_progress',
-              started_at: new Date().toISOString()
-            });
-
       - name: Run Tests in Neuron Container
         id: test-run
         run: |
@@ -27,8 +20,9 @@ jobs:
             -v $(pwd):/workspace \
             public.ecr.aws/neuron/pytorch-inference-neuronx:2.6.0-neuronx-py310-sdk2.23.0-ubuntu22.04 \
             /bin/bash -c "cd /workspace && python3 test/pjrt/test_runtime.py"
-
-      - name: Update Check Status - Complete
+      
+      # Optionally add explicit status reporting
+      - name: Update Check Status
         if: always()
         uses: actions/github-script@v6
         with:
@@ -41,16 +35,8 @@ jobs:
               head_sha: context.sha,
               status: 'completed',
               conclusion: conclusion,
-              completed_at: new Date().toISOString(),
               output: {
-                title: 'Neuron Test Results',
-                summary: `Test run ${conclusion}`
+                title: 'Test Results',
+                summary: `Tests ${conclusion}`
               }
             });
-
-      - name: Exit with proper status
-        if: always()
-        run: |
-          if [[ "${{ steps.test-run.outcome }}" != "success" ]]; then
-            exit 1
-          fi
