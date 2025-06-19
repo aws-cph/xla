@@ -1,28 +1,14 @@
-name: Neuron Tests
+# .github/workflows/test.yml
+name: Basic Test
 on: pull_request
-
-permissions:
-  contents: read
-  actions: write
-  checks: write
-  pull-requests: write
 
 jobs:
   test:
-    name: Neuron Test
-    runs-on: [self-hosted, linux, x64, neuron]  # Match exactly what's configured
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v2
-      - name: Debug Info
+      - name: Simple Test
         run: |
-            ls
-            pwd
-      #     echo "Running on $(hostname)"
-      #     echo "PWD: $(pwd)"
-      #     echo "Runner version: $(cat /opt/actions-runner/VERSION)"
-      # - name: Run Tests in Neuron Container
-      #   run: |
-      #     docker run --rm \
-      #       -v $(pwd):/workspace \
-      #       public.ecr.aws/neuron/pytorch-inference-neuronx:2.6.0-neuronx-py310-sdk2.23.0-ubuntu22.04 \
-      #       /bin/bash -c "cd /workspace && python3 test/pjrt/test_runtime.py"
+          echo "Hello from runner"
+          pwd
+          ls -la
+
