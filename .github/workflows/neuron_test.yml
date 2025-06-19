@@ -12,23 +12,15 @@ jobs:
     name: Basic Test
     runs-on: self-hosted
     steps:
-      - name: Debug Info
+      - uses: actions/checkout@v2
+      
+      - name: Simple Test
         run: |
-          echo "Runner name: $RUNNER_NAME"
-          echo "GitHub ref: ${{ github.ref }}"
-          echo "GitHub SHA: ${{ github.sha }}"
-          echo "Event name: ${{ github.event_name }}"
+          echo "Hello from runner"
+          echo "Current directory: $(pwd)"
+          echo "Files: $(ls -la)"
           
-      - name: Update Status
-        if: always()
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha: context.sha,
-              state: 'success',
-              description: 'Test completed',
-              context: 'Basic Test'
-            })
+      - name: Report Status
+        run: |
+          echo "::set-output name=status::success"
+          echo "Test completed successfully"
