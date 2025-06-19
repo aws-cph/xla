@@ -1,42 +1,26 @@
 name: Neuron Tests
 on: pull_request
 
-# Add these permissions
 permissions:
   contents: read
   actions: write
   checks: write
-  pull-requests: write  # Add this one too for good measure
+  pull-requests: write
 
 jobs:
   test:
-    runs-on: self-hosted
+    name: Neuron Test
+    runs-on: [self-hosted, linux, x64]  # Match exactly what's configured
     steps:
       - uses: actions/checkout@v2
+      - name: Debug Info
+        run: |
+          echo "Running on $(hostname)"
+          echo "PWD: $(pwd)"
+          echo "Runner version: $(cat /opt/actions-runner/VERSION)"
       - name: Run Tests in Neuron Container
-        id: test-run
         run: |
           docker run --rm \
             -v $(pwd):/workspace \
             public.ecr.aws/neuron/pytorch-inference-neuronx:2.6.0-neuronx-py310-sdk2.23.0-ubuntu22.04 \
             /bin/bash -c "cd /workspace && python3 test/pjrt/test_runtime.py"
-      
-      # Optionally add explicit status reporting
-      - name: Update Check Status
-        if: always()
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const conclusion = '${{ steps.test-run.outcome }}' === 'success' ? 'success' : 'failure';
-            await github.rest.checks.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              name: 'Neuron Tests',
-              head_sha: context.sha,
-              status: 'completed',
-              conclusion: conclusion,
-              output: {
-                title: 'Test Results',
-                summary: `Tests ${conclusion}`
-              }
-            });
