@@ -1,37 +1,36 @@
+# .github/workflows/neuron_test.yml
 name: Neuron Tests
-on:
+on: 
   pull_request:
-    branches:
-      - main  # or master
+    types: [opened, synchronize, reopened]
   push:
     branches:
-      - main  # or master
+      - '*'  # or specific branches like 'main', 'master'
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
-  cancel-in-progress: true
+env:
+  ACTIONS_RUNNER_DEBUG: true
+  ACTIONS_STEP_DEBUG: true
 
 jobs:
-  test:
+  neuron-test:  # give it a specific job ID
+    name: Neuron Test Suite  # give it a clear name
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
-      - name: Run Tests in Neuron Container
-        id: test
+        with:
+          fetch-depth: 1
+      
+      - name: Debug Environment
         run: |
-          echo "Starting test run on ${{ github.sha }}"
+          echo "GitHub ref: ${{ github.ref }}"
+          echo "Event name: ${{ github.event_name }}"
+          echo "SHA: ${{ github.sha }}"
+          pwd
+          ls -la
+
+      - name: Run Tests in Neuron Container
+        run: |
           docker run --rm \
             -v $(pwd):/workspace \
             public.ecr.aws/neuron/pytorch-inference-neuronx:2.6.0-neuronx-py310-sdk2.23.0-ubuntu22.04 \
             /bin/bash -c "cd /workspace && python3 test/pjrt/test_runtime.py"
-      
-      # Add explicit status reporting
-      - name: Update Status
-        if: always()
-        run: |
-          if [[ "${{ steps.test.outcome }}" == "success" ]]; then
-            echo "Tests completed successfully"
-          else
-            echo "Tests failed"
-            exit 1
-          fi
