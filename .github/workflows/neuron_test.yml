@@ -1,34 +1,56 @@
-# .github/workflows/neuron_test.yml
 name: Neuron Tests
-on: 
-  pull_request:
-    branches:
-      - master
-
-env:
-  ACTIONS_RUNNER_DEBUG: true
-  ACTIONS_STEP_DEBUG: true
+on: pull_request
 
 jobs:
-  neuron-test:  # give it a specific job ID
-    name: Neuron Test Suite  # give it a clear name
+  test:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
       
-      - name: Debug Environment
-        run: |
-          echo "GitHub ref: ${{ github.ref }}"
-          echo "Event name: ${{ github.event_name }}"
-          echo "SHA: ${{ github.sha }}"
-          pwd
-          ls -la
+      - name: Update Check Status - In Progress
+        uses: actions/github-script@v6
+        with:
+          script: |
+            await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Neuron Tests',
+              head_sha: context.sha,
+              status: 'in_progress',
+              started_at: new Date().toISOString()
+            });
 
       - name: Run Tests in Neuron Container
+        id: test-run
         run: |
           docker run --rm \
             -v $(pwd):/workspace \
             public.ecr.aws/neuron/pytorch-inference-neuronx:2.6.0-neuronx-py310-sdk2.23.0-ubuntu22.04 \
             /bin/bash -c "cd /workspace && python3 test/pjrt/test_runtime.py"
+
+      - name: Update Check Status - Complete
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const conclusion = '${{ steps.test-run.outcome }}' === 'success' ? 'success' : 'failure';
+            await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Neuron Tests',
+              head_sha: context.sha,
+              status: 'completed',
+              conclusion: conclusion,
+              completed_at: new Date().toISOString(),
+              output: {
+                title: 'Neuron Test Results',
+                summary: `Test run ${conclusion}`
+              }
+            });
+
+      - name: Exit with proper status
+        if: always()
+        run: |
+          if [[ "${{ steps.test-run.outcome }}" != "success" ]]; then
+            exit 1
+          fi
