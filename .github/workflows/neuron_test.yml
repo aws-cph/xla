@@ -2,10 +2,8 @@
 name: Neuron Tests
 on: 
   pull_request:
-    types: [opened, synchronize, reopened]
-  push:
     branches:
-      - '*'  # or specific branches like 'main', 'master'
+      - master
 
 env:
   ACTIONS_RUNNER_DEBUG: true
