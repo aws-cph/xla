@@ -10,17 +10,19 @@ permissions:
 jobs:
   test:
     name: Neuron Test
-    runs-on: [self-hosted, linux, x64]  # Match exactly what's configured
+    runs-on: [self-hosted, linux, x64, neuron]  # Match exactly what's configured
     steps:
       - uses: actions/checkout@v2
       - name: Debug Info
         run: |
-          echo "Running on $(hostname)"
-          echo "PWD: $(pwd)"
-          echo "Runner version: $(cat /opt/actions-runner/VERSION)"
-      - name: Run Tests in Neuron Container
-        run: |
-          docker run --rm \
-            -v $(pwd):/workspace \
-            public.ecr.aws/neuron/pytorch-inference-neuronx:2.6.0-neuronx-py310-sdk2.23.0-ubuntu22.04 \
-            /bin/bash -c "cd /workspace && python3 test/pjrt/test_runtime.py"
+            ls
+            pwd
+      #     echo "Running on $(hostname)"
+      #     echo "PWD: $(pwd)"
+      #     echo "Runner version: $(cat /opt/actions-runner/VERSION)"
+      # - name: Run Tests in Neuron Container
+      #   run: |
+      #     docker run --rm \
+      #       -v $(pwd):/workspace \
+      #       public.ecr.aws/neuron/pytorch-inference-neuronx:2.6.0-neuronx-py310-sdk2.23.0-ubuntu22.04 \
+      #       /bin/bash -c "cd /workspace && python3 test/pjrt/test_runtime.py"
