@@ -1,26 +1,13 @@
 name: Basic Test
 on: pull_request
 
-permissions:
-  contents: read
-  actions: write
-  checks: write
-  pull-requests: write
-
 jobs:
   test:
-    name: Basic Test
     runs-on: self-hosted
+    timeout-minutes: 5  # Add timeout
     steps:
-      - uses: actions/checkout@v2
-      
-      - name: Simple Test
+      - name: Simple Echo
         run: |
           echo "Hello from runner"
+          echo "Current time: $(date)"
           echo "Current directory: $(pwd)"
-          echo "Files: $(ls -la)"
-          
-      - name: Report Status
-        run: |
-          echo "::set-output name=status::success"
-          echo "Test completed successfully"
