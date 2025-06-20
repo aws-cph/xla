@@ -1,21 +1,8 @@
-name: Basic Test
+name: Minimal Test
 on: pull_request
 
 jobs:
   test:
     runs-on: self-hosted
-    timeout-minutes: 5
     steps:
-      - name: Initial Status
-        run: |
-          echo "::notice::Job starting"
-          echo "Runner ID: $RUNNER_NAME"
-          echo "Job ID: $GITHUB_RUN_ID"
-          
-      - uses: actions/checkout@v2
-      
-      - name: Simple Test
-        run: |
-          echo "Running test..."
-          echo "Hello from runner"
-          exit 0
+      - run: echo "hello"
