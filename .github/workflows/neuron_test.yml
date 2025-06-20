@@ -1,12 +1,8 @@
-name: Basic Test
+name: Minimal Test
 on: pull_request
 
 jobs:
   test:
     runs-on: self-hosted
     steps:
-      - name: Simple Test
-        run: |
-          echo "Hello from runner"
-          pwd
-          ls -la
+      - run: echo "hello"
