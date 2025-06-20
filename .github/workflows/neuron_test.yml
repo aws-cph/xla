@@ -1,27 +1,12 @@
 name: Basic Test
-on: 
-  pull_request:
-    types: [opened, synchronize, reopened]
-
-permissions:
-  contents: read
-  actions: write
-  checks: write
-  pull-requests: write
+on: pull_request
 
 jobs:
   test:
-    name: Basic Test
     runs-on: self-hosted
-    # Add this for forks
-    if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
-      - uses: actions/checkout@v2
-        with:
-          # Add these for forks
-          ref: ${{ github.event.pull_request.head.sha }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-      
       - name: Simple Test
         run: |
           echo "Hello from runner"
+          pwd
+          ls -la
