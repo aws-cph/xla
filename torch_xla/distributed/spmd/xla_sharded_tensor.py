@@ -245,6 +245,24 @@ class XLAShardedTensor(torch.Tensor):
     """Invalidate the cached DTensorSpec."""
     self._cached_spec = None
 
+  def redistribute(self, device_mesh, placements, *, async_op: bool = False):
+    # Convert placements to partition spec for tensor dimensions
+    partition_spec = [None] * len(self.global_tensor.shape)
+    for mesh_dim, placement in enumerate(placements):
+      if isinstance(placement, Shard):
+        partition_spec[placement.dim] = mesh_dim
+
+    tile_assignment = device_mesh.device_ids.reshape(
+        device_mesh.mesh_shape).tolist()
+    op_sharding = torch_xla._XLAC.OpSharding(tile_assignment, [], [], 3)
+    torch_xla._XLAC._xla_annotate_custom_sharding(self.global_tensor,
+                                                  op_sharding)
+
+    return XLAShardedTensor(
+        self.global_tensor.clone() if async_op else self.global_tensor,
+        mesh_shape=device_mesh.mesh_shape,
+        partition_spec=tuple(partition_spec))
+
   @classmethod
   def __torch_function__(cls, func, types, args=(), kwargs=None):
     return super().__torch_function__(func, types, args, kwargs)
