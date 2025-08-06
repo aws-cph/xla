@@ -301,3 +301,131 @@ class XLAShardedTensor(torch.Tensor):
   @classmethod
   def __torch_function__(cls, func, types, args=(), kwargs=None):
     return super().__torch_function__(func, types, args, kwargs)
+
+
+# Factory functions for XLAShardedTensor
+def _create_tensor_with_xla_ops(size,
+                                fill_value,
+                                dtype=None,
+                                device=None,
+                                requires_grad=False,
+                                mesh=None,
+                                partition_spec=None):
+  """Create tensors using XLA ops without materializing full tensor."""
+  if dtype is None:
+    dtype = torch.float32
+
+  # Create scalar tensor and broadcast
+  scalar_tensor = torch.tensor(
+      fill_value,
+      dtype=dtype,
+      device=torch_xla.device(),
+      requires_grad=requires_grad)
+  return scalar_tensor.expand(size)
+
+
+def zeros(*size,
+          dtype=None,
+          device=None,
+          requires_grad=False,
+          mesh=None,
+          partition_spec=None):
+  """Create XLAShardedTensor filled with zeros."""
+  global_tensor = _create_tensor_with_xla_ops(size, 0.0, dtype, device,
+                                              requires_grad, mesh,
+                                              partition_spec)
+  return XLAShardedTensor(
+      global_tensor,
+      mesh_shape=mesh.shape if mesh else None,
+      partition_spec=partition_spec,
+      requires_grad=requires_grad)
+
+
+def ones(*size,
+         dtype=None,
+         device=None,
+         requires_grad=False,
+         mesh=None,
+         partition_spec=None):
+  """Create XLAShardedTensor filled with ones."""
+  global_tensor = _create_tensor_with_xla_ops(size, 1.0, dtype, device,
+                                              requires_grad, mesh,
+                                              partition_spec)
+  return XLAShardedTensor(
+      global_tensor,
+      mesh_shape=mesh.shape if mesh else None,
+      partition_spec=partition_spec,
+      requires_grad=requires_grad)
+
+
+def empty(*size,
+          dtype=None,
+          device=None,
+          requires_grad=False,
+          mesh=None,
+          partition_spec=None):
+  """Create XLAShardedTensor with uninitialized data."""
+  global_tensor = _create_tensor_with_xla_ops(size, 0.0, dtype, device,
+                                              requires_grad, mesh,
+                                              partition_spec)
+  return XLAShardedTensor(
+      global_tensor,
+      mesh_shape=mesh.shape if mesh else None,
+      partition_spec=partition_spec,
+      requires_grad=requires_grad)
+
+
+def full(size,
+         fill_value,
+         dtype=None,
+         device=None,
+         requires_grad=False,
+         mesh=None,
+         partition_spec=None):
+  """Create XLAShardedTensor filled with fill_value."""
+  global_tensor = _create_tensor_with_xla_ops(size, fill_value, dtype, device,
+                                              requires_grad, mesh,
+                                              partition_spec)
+  return XLAShardedTensor(
+      global_tensor,
+      mesh_shape=mesh.shape if mesh else None,
+      partition_spec=partition_spec,
+      requires_grad=requires_grad)
+
+
+def randn(*size,
+          dtype=None,
+          device=None,
+          requires_grad=False,
+          mesh=None,
+          partition_spec=None):
+  """Create XLAShardedTensor with random normal values."""
+  if dtype is None:
+    dtype = torch.float32
+
+  global_tensor = torch.randn(
+      size, dtype=dtype, device=torch_xla.device(), requires_grad=requires_grad)
+  return XLAShardedTensor(
+      global_tensor,
+      mesh_shape=mesh.shape if mesh else None,
+      partition_spec=partition_spec,
+      requires_grad=requires_grad)
+
+
+def rand(*size,
+         dtype=None,
+         device=None,
+         requires_grad=False,
+         mesh=None,
+         partition_spec=None):
+  """Create XLAShardedTensor with random uniform values."""
+  if dtype is None:
+    dtype = torch.float32
+
+  global_tensor = torch.rand(
+      size, dtype=dtype, device=torch_xla.device(), requires_grad=requires_grad)
+  return XLAShardedTensor(
+      global_tensor,
+      mesh_shape=mesh.shape if mesh else None,
+      partition_spec=partition_spec,
+      requires_grad=requires_grad)

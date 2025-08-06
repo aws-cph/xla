@@ -1,4 +1,4 @@
-from .xla_sharded_tensor import XLAShard, XLAShardedTensor
+from .xla_sharded_tensor import XLAShard, XLAShardedTensor, zeros, ones, empty, full, randn, rand
 from .xla_sharding import (
     Mesh, HybridMesh, ShardingType, ShardingSpec, XLAPatchedLinear,
     mark_sharding, mark_sharding_with_gradients, clear_sharding, get_1d_mesh,
@@ -12,6 +12,12 @@ __all__ = [
     "auto_policy",
     "XLAShard",
     "XLAShardedTensor",
+    "zeros",
+    "ones",
+    "empty",
+    "full",
+    "randn",
+    "rand",
     "Mesh",
     "HybridMesh",
     "ShardingType",
