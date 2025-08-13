@@ -10,6 +10,7 @@ import torch_xla.runtime as xr
 from torch.distributed.tensor._dtensor_spec import DTensorSpec, TensorMeta
 from torch.distributed.device_mesh import DeviceMesh
 from torch.distributed.tensor.placement_types import Shard, Replicate
+from torch.distributed.tensor import DTensor
 from torch.utils._pytree import tree_map_only
 
 
@@ -63,7 +64,7 @@ def no_dispatch() -> Iterator[None]:
     del guard
 
 
-class XLAShardedTensor(torch.Tensor):
+class XLAShardedTensor(DTensor):
   """
     A wrapper around `torch.Tensor` with sharding annotation
     for XLA SPMD auto-sharding. The wrapped tensors are unwrapped
@@ -105,25 +106,58 @@ class XLAShardedTensor(torch.Tensor):
               partition_spec=None,
               *args,
               **kwargs):
-    # TODO(yeounoh) wrapper can take different arguments
-    r = torch.Tensor._make_wrapper_subclass(  # type: ignore[attr-defined]
-        cls,
-        elem.size(),
-        strides=elem.stride(),
-        storage_offset=elem.storage_offset(),
-        dtype=elem.dtype,
-        layout=elem.layout,
-        device=elem.device,
-        requires_grad=kwargs.get("requires_grad", False))
-    r.global_tensor = elem.detach() if r.requires_grad else elem
-
-    # Initialize mesh, partition, and spec information
+    # Create DTensorSpec from mesh_shape and partition_spec
+    if mesh_shape is not None and partition_spec is not None:
+      device_count = xr.global_runtime_device_count()
+      device_list = list(range(device_count))
+      mesh = DeviceMesh("xla", torch.tensor(device_list).reshape(mesh_shape))
+      
+      placements = []
+      for mesh_dim in range(len(mesh_shape)):
+        tensor_dim = None
+        for t_dim, m_dim in enumerate(partition_spec):
+          if m_dim == mesh_dim:
+            tensor_dim = t_dim
+            break
+        placements.append(
+            Shard(tensor_dim) if tensor_dim is not None else Replicate())
+      
+      tensor_meta = TensorMeta(
+          shape=elem.shape,
+          stride=elem.stride(),
+          dtype=elem.dtype)
+      
+      spec = DTensorSpec(
+          mesh=mesh, placements=tuple(placements), tensor_meta=tensor_meta)
+    else:
+      # Create default spec
+      device_count = xr.global_runtime_device_count()
+      device_list = list(range(device_count))
+      mesh = DeviceMesh("xla", torch.tensor(device_list).reshape((device_count,)))
+      placements = (Replicate(),)
+      tensor_meta = TensorMeta(
+          shape=elem.shape,
+          stride=elem.stride(),
+          dtype=elem.dtype)
+      spec = DTensorSpec(
+          mesh=mesh, placements=placements, tensor_meta=tensor_meta)
+    
+    # Create DTensor instance
+    local_tensor = elem
+    r = super().__new__(cls, local_tensor, spec, requires_grad=kwargs.get("requires_grad", False))
+    
+    # Store XLA-specific attributes
+    r.global_tensor = elem
     r.mesh_shape = mesh_shape or (elem.mesh_shape if isinstance(
-        elem, XLAShardedTensor) else None)
+        elem, XLAShardedTensor) else tuple(spec.mesh.mesh.shape))
     r.partition_spec = partition_spec or (elem.partition_spec if isinstance(
         elem, XLAShardedTensor) else None)
     r._cached_spec = None
     return r
+
+  def __init__(self, *args, **kwargs):
+    super().__init__()
+    self._cached_spec = None
 
   # Shards on the devices are materialized/available after the lazy
   # execution of the partitioned HLO graph. Each XLAShard points
@@ -241,10 +275,11 @@ class XLAShardedTensor(torch.Tensor):
         mesh=mesh, placements=tuple(placements), tensor_meta=tensor_meta)
     return self._cached_spec
 
+  @_spec.setter
+  def _spec(self, value):
+    """Setter for _spec property to allow DTensor.__new__ to set it."""
+    self._cached_spec = value
+
   def invalidate_spec_cache(self):
     """Invalidate the cached DTensorSpec."""
     self._cached_spec = None
-
-  @classmethod
-  def __torch_function__(cls, func, types, args=(), kwargs=None):
-    return super().__torch_function__(func, types, args, kwargs)
